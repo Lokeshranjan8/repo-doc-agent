@@ -1,8 +1,11 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ModeToggle } from "./components/mode-toggle"
+import { useNavigate } from "react-router"
 
 export const App = () => {
+
+  const router = useNavigate();
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="w-full border-b border-border/50">
@@ -10,7 +13,7 @@ export const App = () => {
           <span className="text-xl font-semibold">MyCloud</span>
           <div className="flex items-center gap-3">
             <Button variant="ghost">Login</Button>
-            <Button>Get Started</Button>
+            <Button onClick={() => router('/home')}>Get Started</Button>
             <ModeToggle />
           </div>
         </nav>
@@ -24,7 +27,7 @@ export const App = () => {
           MyCloud gives you edge deployments, instant rollbacks, logs, and analytics — all from one platform.
         </p>
         <div className="flex gap-4 mt-8">
-          <Button size="lg" className="px-6">Start Now</Button>
+          <Button onClick={() => router('/home')} size="lg" className="px-6">Start Now</Button>
           <Button size="lg" variant="secondary" className="px-6">Documentation</Button>
         </div>
       </main>
