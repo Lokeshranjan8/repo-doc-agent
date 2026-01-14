@@ -14,7 +14,6 @@ def fetch_repo(repo_url: str):
     
     files = file_system(repo_url)
     return {
-        "repository": repo,
         "files": files
     }
 
