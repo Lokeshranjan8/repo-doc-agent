@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,HTTPException
 from app.gitfetch.git import fetch_github_repo
+from app.gitfetch.filerepo import file_system
 
 app = FastAPI()
 
@@ -10,4 +11,10 @@ def root():
 @app.get("/fetchrepo")
 def fetch_repo(repo_url: str):
     repo = fetch_github_repo(repo_url)
-    return {"fetched_repo": repo}
+    
+    files = file_system(repo_url)
+    return {
+        "repository": repo,
+        "files": files
+    }
+
