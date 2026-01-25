@@ -23,85 +23,79 @@ llm = ChatGroq(
 
 parser = JsonOutputParser()
 prompt = ChatPromptTemplate.from_template("""
-You are an expert technical writer and senior software engineer.
-Your task is to generate a high-quality, professional README.md file for a GitHub repository.
+You are a repository analyzer that identifies ONLY the most essential files for README documentation.
 
-Task:
-You are provided with:
-- A GitHub repository URL
-- Parsed repository metadata retrieved via the GitHub API, including:
-  - File and folder structure
-  - Source code contents
-  - Package/config files (package.json, pyproject.toml, go.mod, etc.)
-  - Scripts, environment files, and documentation (if any)
 
-Rules:
-- You must NOT invent features
-- You must infer everything strictly from the parsed repository data
-- Use ONLY file paths exactly as provided
-- Do NOT explain
-- Do NOT add extra text
-- Return JSON only
-- No markdown outside JSON
-- No comments
-- No analysis
-- No assumptions
+CRITICAL FILES TO INCLUDE:
 
-Objective:
-Analyze the repository to:
-- Understand the project purpose
-- Identify the tech stack
-- Infer features and working logic
-- Understand project structure
-- Extract setup and scripts
-- Generate a complete professional README.md
+**Dependency Management (ALWAYS include if present):**
+- package.json, package-lock.json, yarn.lock, pnpm-lock.yaml, requirement.txt, requirements.txt
+- Pipfile, Pipfile.lock, poetry.lock, pyproject.toml
+- Gemfile, Gemfile.lock, go.mod, go.sum
+- pom.xml, build.gradle, build.gradle.kts
+- Cargo.toml, Cargo.lock, composer.json, composer.lock
 
-README Structure (Mandatory Order):
-1. Project Title  
-2. Description  
-3. Tech Stack  
-4. Project Structure  
-5. Features  
-6. How It Works  
-7. Setup & Installation  
-8. Scripts / Commands  
-9. Future Improvements  
+**Containerization (ALWAYS include if present):**
+- Dockerfile (anywhere), docker-compose.yml, docker.compose.yml, compose.yml, .dockerignore
 
-Return JSON Format:
+**Environment/Configuration (root or one level deep only):**
+- .env.example, .env.sample, env.example
+- config.yml, config.yaml (root level only)
+- Makefile, CMakeLists.txt, setup.py, setup.cfg
 
-{
-  "project_title": "",
-  "description": "",
-  "tech_stack": {
-    "frontend": [],
-    "backend": [],
-    "database": [],
-    "apis": [],
-    "tooling": []
-  },
-  "project_structure": [
-    {
-      "path": "",
-      "description": ""
-    }
-  ],
-  "features": [],
-  "how_it_works": [],
-  "setup_installation": [],
-  "scripts": [],
-  "future_improvements": [],
-  "readme_md": ""
-}
+**CI/CD (main workflow files only):**
+- .github/workflows/main.yml, .github/workflows/ci.yml, .github/workflows/deploy.yml
+- .gitlab-ci.yml, Jenkinsfile
 
-Where:
-- `project_structure.path` must use exact paths from {file_paths}
-- `readme_md` must contain the full README in Markdown format
-- All sections must be generated
-- No field can be null
-- Empty arrays allowed if data is not inferable
+STRICT EXCLUSIONS - NEVER INCLUDE:
 
+**Source Code & Deep Nested Files:**
+- Any .py, .js, .ts, .tsx, .jsx files inside: src/, app/, components/, pages/, lib/, utils/, core/
+- Files 3+ levels deep (e.g., backend/app/core/config.py) UNLESS it's Dockerfile or docker-compose
+- Example excludes: backend/app/Agent/node1.py, frontend/src/components/ui/button.tsx
+
+**Tests & Documentation:**
+- test*.*, *test.*, *.spec.*, *.test.*, tests.py, anything in __tests__/ or tests/
+- README.md, LICENSE, CONTRIBUTING.md, docs/
+
+**Build Outputs & IDE:**
+- node_modules/, dist/, build/, __pycache__/, .venv/, venv/, target/, out/
+- .gitignore, .git/, .vscode/, .idea/, *.swp, .DS_Store
+
+**UI & Config Components:**
+- Anything in: components/ui/, pages/, public/
+- Deep config files: backend/app/core/config.py (too nested)
+- TypeScript configs: tsconfig.*.json, vite.config.ts, eslint.config.js
+- Component configs: components.json
+
+AVAILABLE FILES:
+{file_paths}
+
+INSTRUCTIONS:
+1. Scan the file paths provided above
+2. Select ONLY files matching critical criteria from the EXACT paths given
+3. Return paths EXACTLY as they appear (e.g., "backend/requirement.txt" not "requirements.txt")
+4. Maximum 8 files for single service, 12 for multi-service projects
+5. Prioritize: dependencies → containers → environment files
+
+OUTPUT REQUIREMENTS:
+- Return ONLY valid JSON
+- Use EXACT paths from the input
+- NO explanations, NO markdown, NO extra text
+- Just the JSON object
+
+Return format:
+{{
+  "readme_imp": [
+    "backend/requirement.txt",
+    "backend/Dockerfile",
+    "docker.compose.yml",
+    "frontend/package.json"
+  ]
+}}
+
+Now analyze and return ONLY the JSON object.
 """)
-
 
 
 

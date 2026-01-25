@@ -26,26 +26,26 @@ def fetch_repo(repo_url: str):
         
         print("files fetched successfully           #2")
         result = graph.invoke(payload)
-        print("Lets extract usefull files with a repo object    #3")
+        # print("Lets extract usefull files with a repo object    #3")
+
+        # # data = {
+        # #     "repo": result["repo"],
+        # #     "readme_imp": result["readme_imp"]
+        # # }
 
         # data = {
-        #     "repo": result["repo"],
-        #     "readme_imp": result["readme_imp"]
+        #     "repo": "Lokeshranjan8/repo-doc-agent",
+        #     "readme_imp": ["backend/Dockerfile"]
         # }
+        # raw_data = storingdata(data)
+        # # eg_data = {
+        # #     "path":"path/name",
+        # #     "content":"raw_text"
+        # # }
+        # readme_gen.invoke(raw_data)
+        # print(raw_data)
 
-        data = {
-            "repo": "Lokeshranjan8/repo-doc-agent",
-            "readme_imp": ["backend/Dockerfile"]
-        }
-        raw_data = storingdata(data)
-        # eg_data = {
-        #     "path":"path/name",
-        #     "content":"raw_text"
-        # }
-        readme_gen.invoke(raw_data)
-        print(raw_data)
-
-        return payload
+        return result
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
