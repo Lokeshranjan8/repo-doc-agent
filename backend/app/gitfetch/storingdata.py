@@ -10,7 +10,7 @@ def storingdata(data) -> dat_response:
     try:
         repos = data["repo"]
         raw_content = []
-        for path in data["readme_imp"]
+        for path in data["readme_imp"]:
             content = read_file(repos,path)
             raw_content.append({
                 "path":path,

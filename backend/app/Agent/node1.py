@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # STATE
-class node1state(TypedDict):
+class node1state(TypedDict,total=False):
     repo: str
     files: List[Dict[str, str]]
     readme_imp: List[str]
@@ -65,13 +65,6 @@ def judge_files(state: node1state) -> node1state:
 
     state["readme_imp"] = result.get("readme_imp", [])
     return state
-
-
-# reading 
-# def read_data(state: node1state ) -> node1state:
-
-
-
 
 
 def build_judge_graph():
