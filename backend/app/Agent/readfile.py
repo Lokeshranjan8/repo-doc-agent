@@ -15,24 +15,13 @@ g = Github(GITHUBTOKEN)
 
 def read_file(repo, file_path: str):
     try:
+        repo = g.get_repo(repo)
+
         file_content = repo.get_contents(file_path)
-        return file_content.decoded_content.decode("utf-8")
+        files_data=file_content.decoded_content.decode("utf-8")
+        return files_data
+
     except Exception as e:
-        return f"Error reading file: {str(e)}"
+        print(f"[read_file error] {file_path}: {e}")
+        return None
 
-
-
-def reading_raw_data():
-    try:
-        print("lets validate the data")
-        repo = g.get_repo("Lokeshranjan8/repo-doc-agent")
-        main_data = read_file(repo,"backend/app/main.py")
-        
-        # for pair in result:
-        #  if "repository" in pair:
-        #     print(pair["repository"])
-        #  elif "path" in pair and "name" in pair:
-        #     print(pair["path"], pair["name"])
-        return main_data
-    except Exception as e:
-        return f"Error reading file: {str(e)}"

@@ -21,8 +21,6 @@ def storingdata(data) -> dat_response:
             "raw_data":raw_content
         }
 
-            
-        
     
     except Exception as e:
         return f"Error reading file: {str(e)}"

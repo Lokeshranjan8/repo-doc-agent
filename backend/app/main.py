@@ -3,12 +3,13 @@ from app.gitfetch.git import fetch_github_repo
 from app.gitfetch.filerepo import file_system
 from app.Agent.node1 import build_judge_graph, node1state
 from app.gitfetch.storingdata import storingdata
-from app.Agent.readfile import reading_raw_data
+from app.Agent.generation_graph import generate_readme_graph
 
 import json 
 app = FastAPI()
 
 graph = build_judge_graph()
+readme_gen = generate_readme_graph()
 
 @app.get("/")
 def root():
@@ -22,31 +23,34 @@ def fetch_repo(repo_url: str):
         repo = fetch_github_repo(repo_url)
         print("github repo existing and user tooo   #1")
         payload = file_system(repo_url)
+        
         print("files fetched successfully           #2")
         result = graph.invoke(payload)
-        return result
+        print("Lets extract usefull files with a repo object    #3")
+
+        # data = {
+        #     "repo": result["repo"],
+        #     "readme_imp": result["readme_imp"]
+        # }
+
+        data = {
+            "repo": "Lokeshranjan8/repo-doc-agent",
+            "readme_imp": ["backend/Dockerfile"]
+        }
+        raw_data = storingdata(data)
+        # eg_data = {
+        #     "path":"path/name",
+        #     "content":"raw_text"
+        # }
+        readme_gen.invoke(raw_data)
+        print(raw_data)
+
+        return payload
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/judge/docker-files")
-def judge_docker_files_api(payload: node1state):
-    try:
-        result = graph.invoke(payload)
-        print(type(result))
-
-        data = {
-            "repo": result["repo"],
-            "readme_imp": result["readme_imp"]
-        }
-        print("judje data",type(data))
-        print(type(data))
-        # raw_data = storingdata(data)
-        return result
-
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/readtestfile")
