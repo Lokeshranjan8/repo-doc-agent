@@ -29,7 +29,7 @@ You are a repository analyzer that identifies ONLY the most essential files for 
 CRITICAL FILES TO INCLUDE:
 
 **Dependency Management (ALWAYS include if present):**
-- package.json, package-lock.json, yarn.lock, pnpm-lock.yaml, requirement.txt, requirements.txt
+- package.json, yarn.lock, pnpm-lock.yaml, requirement.txt, requirements.txt
 - Pipfile, Pipfile.lock, poetry.lock, pyproject.toml
 - Gemfile, Gemfile.lock, go.mod, go.sum
 - pom.xml, build.gradle, build.gradle.kts
@@ -53,6 +53,7 @@ STRICT EXCLUSIONS - NEVER INCLUDE:
 - Any .py, .js, .ts, .tsx, .jsx files inside: src/, app/, components/, pages/, lib/, utils/, core/
 - Files 3+ levels deep (e.g., backend/app/core/config.py) UNLESS it's Dockerfile or docker-compose
 - Example excludes: backend/app/Agent/node1.py, frontend/src/components/ui/button.tsx
+- never include package-lock.json
 
 **Tests & Documentation:**
 - test*.*, *test.*, *.spec.*, *.test.*, tests.py, anything in __tests__/ or tests/

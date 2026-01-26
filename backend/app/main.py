@@ -20,36 +20,35 @@ def root():
 @app.get("/fetchrepo")
 def fetch_repo(repo_url: str):
     try:
+
         repo = fetch_github_repo(repo_url)
         print("github repo existing and user tooo   #1")
         payload = file_system(repo_url)
+        
         
         print("files fetched successfully           #2")
         result = graph.invoke(payload)
         # print("Lets extract usefull files with a repo object    #3")
 
-        # # data = {
-        # #     "repo": result["repo"],
-        # #     "readme_imp": result["readme_imp"]
-        # # }
+        data = {
+            "repo": result["repo"],
+            "readme_imp": result["readme_imp"]
+        }
 
         # data = {
         #     "repo": "Lokeshranjan8/repo-doc-agent",
         #     "readme_imp": ["backend/Dockerfile"]
         # }
-        # raw_data = storingdata(data)
-        # # eg_data = {
-        # #     "path":"path/name",
-        # #     "content":"raw_text"
-        # # }
-        # readme_gen.invoke(raw_data)
-        # print(raw_data)
 
-        return result
+        raw_data = storingdata(data)
+
+       
+        # readme_gen.invoke(raw_data) //final stage 
+
+        return raw_data
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 
 

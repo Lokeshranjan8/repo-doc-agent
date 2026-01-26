@@ -9,3 +9,15 @@ services:
       - "8081:8081"
     env_file:
       - ./backend/app/.env
+    depends_on:
+      - redis
+    
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-agent
+    ports:
+      - "6379:6379"
+    env_file:
+      - ./backend/app/.env
+
