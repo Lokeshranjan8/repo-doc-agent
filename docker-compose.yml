@@ -20,4 +20,9 @@ services:
       - "6379:6379"
     env_file:
       - ./backend/app/.env
+    volumes:
+      - redis_data:/data
 
+
+volumes:
+  redis_data:

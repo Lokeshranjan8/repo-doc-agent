@@ -14,11 +14,8 @@ if not GITHUBTOKEN:
 
 g = Github(GITHUBTOKEN)
 
-metadata={
-    "files":[]
-}
 
-def traverse_repo(repo, path=""):
+def traverse_repo(repo,metadata, path=""):
     contents = repo.get_contents(path)
     for x in contents:
         metadata["files"].append({
@@ -47,8 +44,10 @@ def file_system(repo_url: str):
     full_repo_name = f"{user}/{repo_name}"
 
     repo = g.get_repo(full_repo_name)
+    
+    metadata={"files":[]}
 
-    traverse_repo(repo)
+    traverse_repo(repo,metadata)
     
     metadata.update({"repo": repo.full_name})
     # json_data = json.dumps(metadata, indent=4, ensure_ascii=False)
