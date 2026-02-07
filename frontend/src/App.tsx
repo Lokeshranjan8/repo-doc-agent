@@ -1,74 +1,126 @@
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { ModeToggle } from "./components/mode-toggle"
-import { useNavigate } from "react-router"
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, Github, CheckCircle2, XCircle } from 'lucide-react';
 
-export const App = () => {
+export const Home = () => {
+  const [githubLink, setGithubLink] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
 
-  const router = useNavigate();
+  const handleSubmit = async (e: React.MouseEvent | React.KeyboardEvent) => {
+    e.preventDefault();
+
+    const githubRegex = /^https?:\/\/(www\.)?github\.com\/.+/;
+    if (!githubRegex.test(githubLink)) {
+      setStatus({
+        type: 'error',
+        message: 'Please enter a valid GitHub URL'
+      });
+      return;
+    }
+
+    setIsLoading(true);
+    setStatus({ type: null, message: '' });
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ githubLink }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to process GitHub link');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      setStatus({
+        type: 'success',
+        message: 'GitHub link processed successfully!'
+      });
+      setGithubLink('');
+    } catch (error) {
+      setStatus({
+        type: 'error',
+        message: error instanceof Error ? error.message : 'An error occurred'
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="w-full border-b border-border/50">
-        <nav className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-          <span className="text-xl font-semibold">MyCloud</span>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost">Login</Button>
-            <Button onClick={() => router('/home')}>Get Started</Button>
-            <ModeToggle />
+    <div className="min-h-screen flex items-center justify-center p-4 bg-linear-to-br from-background to-muted">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <div className="flex items-center justify-center mb-4">
+            <div className="p-3 rounded-full bg-primary/10">
+              <Github className="w-8 h-8 text-primary" />
+            </div>
           </div>
-        </nav>
-      </header>
+          <CardTitle className="text-2xl text-center">GitHub Repository</CardTitle>
+          <CardDescription className="text-center">
+            Enter a GitHub repository URL to analyze
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Input
+                type="url"
+                placeholder="https://github.com/username/repository"
+                value={githubLink}
+                onChange={(e) => setGithubLink(e.target.value)}
+                disabled={isLoading}
+                className="w-full"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleSubmit(e);
+                  }
+                }}
+              />
+            </div>
 
-      <main className="flex-1 max-w-6xl mx-auto flex flex-col items-center justify-center text-center px-6 py-24">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Deploy apps globally in seconds.
-        </h1>
-        <p className="text-muted-foreground max-w-xl mt-4 text-lg">
-          MyCloud gives you edge deployments, instant rollbacks, logs, and analytics — all from one platform.
-        </p>
-        <div className="flex gap-4 mt-8">
-          <Button onClick={() => router('/home')} size="lg" className="px-6">Start Now</Button>
-          <Button size="lg" variant="secondary" className="px-6">Documentation</Button>
-        </div>
-      </main>
+            {status.type && (
+              <Alert variant={status.type === 'error' ? 'destructive' : 'default'}>
+                <div className="flex items-start gap-2">
+                  {status.type === 'success' ? (
+                    <CheckCircle2 className="h-4 w-4 mt-0.5" />
+                  ) : (
+                    <XCircle className="h-4 w-4 mt-0.5" />
+                  )}
+                  <AlertDescription>{status.message}</AlertDescription>
+                </div>
+              </Alert>
+            )}
 
-      <section className="w-full py-20 border-t border-border/50 bg-muted/20">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              title: "Global Edge",
-              desc: "Deploy from anywhere to everywhere in under a second.",
-            },
-            {
-              title: "Auto Scaling",
-              desc: "Effortlessly scale as traffic spikes without intervention.",
-            },
-            {
-              title: "Instant Rollbacks",
-              desc: "Revert deployments instantly with zero downtime.",
-            },
-          ].map((feature, i) => (
-            <Card key={i} className="border-border/50 bg-card">
-              <CardContent className="p-6 space-y-2">
-                <h3 className="text-lg font-semibold">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {feature.desc}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <footer className="w-full border-t border-border/50 py-6">
-        <div className="max-w-6xl mx-auto px-6 flex justify-between text-sm text-muted-foreground">
-          <span>© 2026 MyCloud</span>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-foreground">Terms</a>
-            <a href="#" className="hover:text-foreground">Privacy</a>
+            <Button
+              onClick={handleSubmit}
+              className="w-full"
+              disabled={isLoading || !githubLink}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Submit'
+              )}
+            </Button>
           </div>
-        </div>
-      </footer>
+        </CardContent>
+      </Card>
     </div>
-  )
-}
+  );
+};
