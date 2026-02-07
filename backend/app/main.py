@@ -5,6 +5,8 @@ from app.gitfetch.filerepo import file_system
 from app.Agent.node1 import build_judge_graph, node1state
 from app.gitfetch.storingdata import storingdata
 from app.Agent.generation_graph import generate_readme_graph
+from pydantic import BaseModel
+
 
 import json 
 app = FastAPI()
@@ -20,15 +22,20 @@ app.add_middleware(
 graph = build_judge_graph()
 readme_gen = generate_readme_graph()
 
+
+class RepoRequest(BaseModel):
+    repo_url: str
+
 @app.get("/")
 def root():
     return {"message": "Hello, World!"}
 
 
 
-@app.get("/fetchrepo")
-def fetch_repo(repo_url: str):
+@app.post("/fetchrepo")
+def fetch_repo(data: RepoRequest):
     try:
+
 
         # # repo = fetch_github_repo(repo_url)
         # print("dont #1")
@@ -65,6 +72,8 @@ def fetch_repo(repo_url: str):
                 }
             ]
         }
+
+      
 
         try:
             result_1= readme_gen.invoke(data)

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Loader2, Link2, FileText } from "lucide-react"
+import ReactMarkdown from 'react-markdown';
 
 export const App = () => {
   const [link, setLink] = useState("")
@@ -9,15 +10,39 @@ export const App = () => {
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async () => {
-    if (!link.trim()) return
+    if (!link.trim()){
+      console.log("invalid empty link")
+      return 
+    }
 
     setLoading(true)
-    // Simulate processing - replace with actual API call
-    setTimeout(() => {
-      setResult(`Processed: ${link}`)
-      setLoading(false)
-    }, 2000)
-  }
+    try {
+      const response_struct = {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          repo_url: link
+        })
+      }
+
+      const response = await fetch('http://localhost:8081/fetchrepo', response_struct);
+      const data = await response.json();
+
+      console.log(data)
+
+      setResult(`Processed: ${data.readme}`)
+
+    }
+    catch (error) {
+      console.error("Fetch Error:", error);
+      setResult("Something went wrong!");
+    }
+
+    setLoading(false)
+
+  };
 
   return (
     <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/30 flex items-center justify-center p-4">
@@ -68,7 +93,10 @@ export const App = () => {
                 <FileText className="w-5 h-5 text-primary mt-0.5" />
                 <div className="space-y-1">
                   <p className="text-sm font-medium">Result</p>
-                  <p className="text-sm text-muted-foreground">{result}</p>
+                  <div className="result-container">
+                    <ReactMarkdown>{result}</ReactMarkdown>
+                  </div>
+                {/* <p className="text-sm text-muted-foreground">{result}</p> */}
                 </div>
               </div>
             </div>
