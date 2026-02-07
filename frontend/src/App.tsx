@@ -1,74 +1,81 @@
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { ModeToggle } from "./components/mode-toggle"
-import { useNavigate } from "react-router"
+import { Input } from "@/components/ui/input"
+import { Loader2, Link2, FileText } from "lucide-react"
 
 export const App = () => {
+  const [link, setLink] = useState("")
+  const [result, setResult] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const router = useNavigate();
+  const handleSubmit = async () => {
+    if (!link.trim()) return
+
+    setLoading(true)
+    // Simulate processing - replace with actual API call
+    setTimeout(() => {
+      setResult(`Processed: ${link}`)
+      setLoading(false)
+    }, 2000)
+  }
+
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="w-full border-b border-border/50">
-        <nav className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-          <span className="text-xl font-semibold">MyCloud</span>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost">Login</Button>
-            <Button onClick={() => router('/home')}>Get Started</Button>
-            <ModeToggle />
-          </div>
-        </nav>
-      </header>
+    <div className="min-h-screen bg-linear-to-br from-background via-background to-muted/30 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg space-y-8">
+        
 
-      <main className="flex-1 max-w-6xl mx-auto flex flex-col items-center justify-center text-center px-6 py-24">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight">
-          Deploy apps globally in seconds.
-        </h1>
-        <p className="text-muted-foreground max-w-xl mt-4 text-lg">
-          MyCloud gives you edge deployments, instant rollbacks, logs, and analytics — all from one platform.
-        </p>
-        <div className="flex gap-4 mt-8">
-          <Button onClick={() => router('/home')} size="lg" className="px-6">Start Now</Button>
-          <Button size="lg" variant="secondary" className="px-6">Documentation</Button>
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Repo Doc Agent
+          </h1>
+          <p className="text-muted-foreground text-sm">
+            Enter a GitHub repository link to generate documentation
+          </p>
         </div>
-      </main>
 
-      <section className="w-full py-20 border-t border-border/50 bg-muted/20">
-        <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[
-            {
-              title: "Global Edge",
-              desc: "Deploy from anywhere to everywhere in under a second.",
-            },
-            {
-              title: "Auto Scaling",
-              desc: "Effortlessly scale as traffic spikes without intervention.",
-            },
-            {
-              title: "Instant Rollbacks",
-              desc: "Revert deployments instantly with zero downtime.",
-            },
-          ].map((feature, i) => (
-            <Card key={i} className="border-border/50 bg-card">
-              <CardContent className="p-6 space-y-2">
-                <h3 className="text-lg font-semibold">{feature.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  {feature.desc}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <footer className="w-full border-t border-border/50 py-6">
-        <div className="max-w-6xl mx-auto px-6 flex justify-between text-sm text-muted-foreground">
-          <span>© 2026 MyCloud</span>
-          <div className="flex gap-4">
-            <a href="#" className="hover:text-foreground">Terms</a>
-            <a href="#" className="hover:text-foreground">Privacy</a>
+        <div className="relative group">
+          <div className="absolute -inset-0.5 bg-linear-to-r from-primary/20 to-primary/5 rounded-lg blur opacity-50 group-hover:opacity-100 transition duration-500" />
+          <div className="relative flex items-center gap-2 bg-card border border-border/50 rounded-lg p-2">
+            <Link2 className="w-5 h-5 text-muted-foreground ml-2" />
+            <Input
+              type="url"
+              placeholder="https://github.com/username/repository"
+              value={link}
+              onChange={(e) => setLink(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              className="border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+            />
+            <Button
+              onClick={handleSubmit}
+              disabled={loading || !link.trim()}
+              size="sm"
+              className="mr-1"
+            >
+              {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                "Generate"
+              )}
+            </Button>
           </div>
         </div>
-      </footer>
+
+        {/* Result Box */}
+        {result && (
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="bg-card/80 backdrop-blur-sm border border-border/50 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <FileText className="w-5 h-5 text-primary mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Result</p>
+                  <p className="text-sm text-muted-foreground">{result}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
+

@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from app.gitfetch.git import fetch_github_repo
 from app.gitfetch.filerepo import file_system
 from app.Agent.node1 import build_judge_graph, node1state
@@ -7,6 +8,14 @@ from app.Agent.generation_graph import generate_readme_graph
 
 import json 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"], # Allows all methods
+    allow_headers=["*"], # Allows all headers
+)
 
 graph = build_judge_graph()
 readme_gen = generate_readme_graph()
