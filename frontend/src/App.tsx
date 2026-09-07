@@ -13,13 +13,14 @@ import { Button } from "@/components/ui/button";
 import { ReadmeGenerator, type ReadmeResponse } from "@/components/ReadmeGenerator";
 
 const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8081";
-
-
-console.log(`app url = ${apiUrl}`)
+const githubTokenStorageKey = "docpilot.githubAccessToken";
 
 
 export const App = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [githubToken, setGithubToken] = useState<string | null>(() =>
+    sessionStorage.getItem(githubTokenStorageKey),
+  );
   const [authInitialized, setAuthInitialized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -35,7 +36,15 @@ export const App = () => {
     setMessage("");
     setLoading(true);
     try {
-      await signInWithPopup(auth, new GithubAuthProvider());
+      const provider = new GithubAuthProvider();
+      provider.addScope("repo");
+      const result = await signInWithPopup(auth, provider);
+      const credential = GithubAuthProvider.credentialFromResult(result);
+      if (!credential?.accessToken) {
+        throw new Error("GitHub did not return an access token.");
+      }
+      setGithubToken(credential.accessToken);
+      sessionStorage.setItem(githubTokenStorageKey, credential.accessToken);
     } catch (signInError) {
       setMessage(signInError instanceof Error ? signInError.message : "GitHub sign-in failed.");
       setLoading(false);
@@ -43,16 +52,21 @@ export const App = () => {
   }
 
   async function signOutUser() {
+    setGithubToken(null);
+    sessionStorage.removeItem(githubTokenStorageKey);
     await signOut(auth);
   }
 
   async function authenticatedRequest<T>(path: string, body: object): Promise<T> {
-    if (!user) throw new Error("You must be signed in to use the README generator.");
-    const token = await user.getIdToken();
+    if (!user || !githubToken) {
+      throw new Error("Please sign in with GitHub to use the README generator.");
+    }
+    const firebaseToken = await user.getIdToken();
     const response = await fetch(`${apiUrl}${path}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${firebaseToken}`,
+        "X-GitHub-Token": githubToken,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),

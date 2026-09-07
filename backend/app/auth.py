@@ -13,8 +13,6 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
 
 def verify_token(token: str) -> dict:
     try:
-        # Do this on demand: a missing local credential must not stop unrelated
-        # endpoints (or FastAPI's startup) from running.
         initialize_firebase()
         return auth.verify_id_token(token, check_revoked=True)
 

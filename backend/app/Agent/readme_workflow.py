@@ -12,7 +12,7 @@ from langgraph.types import interrupt
 load_dotenv()
 
 llm = ChatGroq(
-    model="llama-3.1-8b-instant",
+    model="openai/gpt-oss-120b",
     api_key=os.getenv("GROQ_API"),
     temperature=0,
 )

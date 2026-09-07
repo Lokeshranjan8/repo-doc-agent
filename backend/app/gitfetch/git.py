@@ -1,14 +1,9 @@
 from urllib.parse import urlparse
 from fastapi import HTTPException
 import requests
-import os
-from dotenv import load_dotenv
 
-load_dotenv()
-GITHUB_TOKEN = os.getenv('GITHUBTOKEN')
 
-def fetch_github_repo(repo: str):
-
+def fetch_github_repo(repo: str, github_token: str):
     parsed = urlparse(repo)
     if parsed.scheme != "https":
         raise HTTPException(
@@ -41,8 +36,9 @@ def fetch_github_repo(repo: str):
     
     api_url = f"https://api.github.com/repos/{user}/{repo_name}"
     headers = {
-        "Authorization": f"Bearer {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github+json"
+        "Authorization": f"Bearer {github_token}",
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
     }
     
     try:

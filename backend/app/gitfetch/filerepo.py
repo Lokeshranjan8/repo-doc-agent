@@ -6,14 +6,6 @@ from app.core.redis_cache import set_cache,get_cache
 import json
 import os 
 
-load_dotenv()
-GITHUBTOKEN = os.getenv('GITHUBTOKEN')
-
-if not GITHUBTOKEN:
-    raise ValueError("GITHUB_TOKEN not found in environment")
-
-g = Github(GITHUBTOKEN)
-
 
 def traverse_repo(repo,metadata, path=""):
     contents = repo.get_contents(path)
@@ -28,7 +20,7 @@ def traverse_repo(repo,metadata, path=""):
 
     
 
-def file_system(repo_url: str):
+def file_system(repo_url: str, github_token: str):
 
     key = f"repourl:{repo_url}"
     cache_data = get_cache(key)
